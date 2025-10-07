@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.10'
+            args '-u root'
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -9,41 +14,60 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                echo "Building Docker image..."
-                sh 'docker build -t learn-jenkins-multibranch .'
+                echo "Installing dependencies..."
+                sh 'pip install -r requirements.txt'
             }
         }
 
-        stage('Test') {
+        stage('Run Tests') {
             steps {
                 echo "Running tests..."
-                sh 'pip install flask pytest'
-                sh 'pytest -v'
+                sh 'pytest test_app.py'
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch pattern: "release/.*", comparator: "REGEXP"
+                }
+            }
+            steps {
+                echo "Simulating deploy from branch ${env.BRANCH_NAME}"
             }
         }
     }
 
     post {
         success {
-            echo 'Build Sukses!'
-            httpRequest(
-                httpMode: 'POST',
-                url: 'https://discord.com/api/webhooks/1425012152946790433/G0koVM0hfMK2tvsr48OO7sPH7m2OvtZmmP3_urPVq_Njj-eD7Dfxeia5aOP8WnxqxATN',
-                requestBody: "{\"content\": \"✅ Build Sukses untuk branch ${env.BRANCH_NAME}\"}",
-                contentType: 'APPLICATION_JSON'
-            )
+            script {
+                def payload = [
+                    content: "✅ Build SUCCESS on `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
+                ]
+                httpRequest(
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: groovy.json.JsonOutput.toJson(payload),
+                    url: 'https://discord.com/api/webhooks/1424938849984974951/_uImmwS8YgLPEEQzEtggphicpRbSfHNzZ5zwCyTI5p22CKSMxHOgTUppIqQuiSmiSBOv'
+                )
+            }
         }
 
         failure {
-            echo 'Build Gagal!'
-            httpRequest(
-                httpMode: 'POST',
-                url: 'https://discord.com/api/webhooks/1425012152946790433/G0koVM0hfMK2tvsr48OO7sPH7m2OvtZmmP3_urPVq_Njj-eD7Dfxeia5aOP8WnxqxATN',
-                requestBody: "{\"content\": \"❌ Build Gagal untuk branch ${env.BRANCH_NAME}\"}",
-                contentType: 'APPLICATION_JSON'
-            )
+            script {
+                def payload = [
+                    content: "❌ Build FAILED on `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
+                ]
+                httpRequest(
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: groovy.json.JsonOutput.toJson(payload),
+                    url: 'https://discord.com/api/webhooks/1424938849984974951/_uImmwS8YgLPEEQzEtggphicpRbSfHNzZ5zwCyTI5p22CKSMxHOgTUppIqQuiSmiSBOv'
+                )
+            }
         }
     }
 }
