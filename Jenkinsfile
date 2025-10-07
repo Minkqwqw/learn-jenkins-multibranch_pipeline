@@ -9,8 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: "${env.BRANCH_NAME}",
-                    url: 'https://github.com/FirmansyahDzakwanArifien/learn-jenkins-multibranch_pipeline.git'
+                echo "Checkout branch ${env.BRANCH_NAME}"
             }
         }
 
@@ -23,8 +22,9 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                echo "Running tests..."
-                sh 'pytest test_app.py'
+                echo "Menjalankan tes..."
+                // Force gagal untuk testing
+                sh 'exit 1'
             }
         }
 
@@ -36,7 +36,7 @@ pipeline {
                 }
             }
             steps {
-                echo "Simulating deploy from branch ${env.BRANCH_NAME}"
+                echo "Simulasi deploy dari branch ${env.BRANCH_NAME}"
             }
         }
     }
@@ -45,13 +45,13 @@ pipeline {
         success {
             script {
                 def payload = [
-                    content: "✅ Build SUCCESS on `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
+                    content: "✅ Build SUCCESS di `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
                 ]
                 httpRequest(
                     httpMode: 'POST',
                     contentType: 'APPLICATION_JSON',
                     requestBody: groovy.json.JsonOutput.toJson(payload),
-                    url: 'https://discord.com/api/webhooks/1424938849984974951/_uImmwS8YgLPEEQzEtggphicpRbSfHNzZ5zwCyTI5p22CKSMxHOgTUppIqQuiSmiSBOv'
+                    url: 'https://discord.com/api/webhooks/1425012152946790433/G0koVM0hfMK2tvsr48OO7sPH7m2OvtZmmP3_urPVq_Njj-eD7Dfxeia5aOP8WnxqxATN'
                 )
             }
         }
@@ -59,13 +59,13 @@ pipeline {
         failure {
             script {
                 def payload = [
-                    content: "❌ Build FAILED on `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
+                    content: "❌ Build FAILED di `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
                 ]
                 httpRequest(
                     httpMode: 'POST',
                     contentType: 'APPLICATION_JSON',
                     requestBody: groovy.json.JsonOutput.toJson(payload),
-                    url: 'https://discord.com/api/webhooks/1424938849984974951/_uImmwS8YgLPEEQzEtggphicpRbSfHNzZ5zwCyTI5p22CKSMxHOgTUppIqQuiSmiSBOv'
+                    url: 'https://discord.com/api/webhooks/1425012152946790433/G0koVM0hfMK2tvsr48OO7sPH7m2OvtZmmP3_urPVq_Njj-eD7Dfxeia5aOP8WnxqxATN'
                 )
             }
         }
