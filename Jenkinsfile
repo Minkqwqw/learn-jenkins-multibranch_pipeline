@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: "${env.BRANCH_NAME}",
-                    url: 'https://github.com/FirmansyahDzakwanArifien/learn-jenkins-multibranch_pipeline.git'
+                    url: 'https://github.com/Minkqwqw/learn-jenkins-multibranch_pipeline.git'
             }
         }
 
@@ -51,7 +51,7 @@ pipeline {
                     httpMode: 'POST',
                     contentType: 'APPLICATION_JSON',
                     requestBody: groovy.json.JsonOutput.toJson(payload),
-                    url: 'https://discord.com/api/webhooks/1425012152946790433/G0koVM0hfMK2tvsr48OO7sPH7m2OvtZmmP3_urPVq_Njj-eD7Dfxeia5aOP8WnxqxATN'
+                    url: 'https://discord.com/api/webhooks/1429036405748666368/4aXIlhBtopqkzPu2Z3d0LVu-qzl3cPADzCtjZO2COQ2w6VD1pON41aQfQh5LV8VDZOaQ'
                 )
             }
         }
@@ -65,7 +65,7 @@ pipeline {
                     httpMode: 'POST',
                     contentType: 'APPLICATION_JSON',
                     requestBody: groovy.json.JsonOutput.toJson(payload),
-                    url: 'https://discord.com/api/webhooks/1425012152946790433/G0koVM0hfMK2tvsr48OO7sPH7m2OvtZmmP3_urPVq_Njj-eD7Dfxeia5aOP8WnxqxATN'
+                    url: 'https://discord.com/api/webhooks/1429036405748666368/4aXIlhBtopqkzPu2Z3d0LVu-qzl3cPADzCtjZO2COQ2w6VD1pON41aQfQh5LV8VDZOaQ'
                 )
             }
         }
